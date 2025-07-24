@@ -100,7 +100,7 @@ class AuthTenantInitializer implements TenantInitializer
 
     /**
      * Sync permissions from the manager to the tenant database
-     * 
+     *
      * @return void
      */
     protected function syncPermissions(): void
@@ -119,7 +119,7 @@ class AuthTenantInitializer implements TenantInitializer
 
     /**
      * Create admin role with all permissions
-     * 
+     *
      * @return Role
      */
     protected function createAdminRole(): Role
@@ -139,7 +139,7 @@ class AuthTenantInitializer implements TenantInitializer
 
     /**
      * Create admin user and assign admin role
-     * 
+     *
      * @param Role $adminRole
      * @param Command $command
      * @return User
