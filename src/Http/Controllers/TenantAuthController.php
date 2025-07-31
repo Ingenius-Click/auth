@@ -32,9 +32,7 @@ class TenantAuthController extends Controller
         // If API request, return token
         if ($request->wantsJson()) {
             $token = $user->createToken('auth_token')->plainTextToken;
-            return response()->json([
-                'status' => 'success',
-                'message' => 'User registered successfully',
+            return response()->api(message: 'User registered successfully', data: [
                 'user' => $user,
                 'token' => $token,
             ]);
@@ -77,9 +75,7 @@ class TenantAuthController extends Controller
             }
 
             $token = $user->createToken('auth_token')->plainTextToken;
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Login successful',
+            return response()->api(message: 'Login successful', data: [
                 'user' => $user,
                 'token' => $token,
             ]);
