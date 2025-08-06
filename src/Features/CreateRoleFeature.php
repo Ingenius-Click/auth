@@ -13,7 +13,12 @@ class CreateRoleFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'Create role';
+        return __('Create role');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Roles');
     }
 
     public function getPackage(): string

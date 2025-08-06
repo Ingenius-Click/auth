@@ -13,7 +13,12 @@ class DeleteUserFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'Delete user';
+        return __('Delete user');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Users');
     }
 
     public function getPackage(): string

@@ -13,7 +13,12 @@ class ViewUserFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'View user';
+        return __('View user');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Users');
     }
 
     public function getPackage(): string

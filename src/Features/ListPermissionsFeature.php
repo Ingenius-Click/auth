@@ -13,7 +13,12 @@ class ListPermissionsFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'List permissions';
+        return __('List permissions');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Permissions');
     }
 
     public function getPackage(): string

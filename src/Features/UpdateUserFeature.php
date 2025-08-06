@@ -13,7 +13,12 @@ class UpdateUserFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'Update user';
+        return __('Update user');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Users');
     }
 
     public function getPackage(): string

@@ -13,7 +13,12 @@ class ListRolesFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'List roles';
+        return __('List roles');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Roles');
     }
 
     public function getPackage(): string

@@ -13,7 +13,12 @@ class UpdateRoleFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'Update role';
+        return __('Update role');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Roles');
     }
 
     public function getPackage(): string

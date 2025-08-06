@@ -13,7 +13,12 @@ class SyncPermissionsFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'Sync permissions';
+        return __('Sync permissions');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Permissions');
     }
 
     public function getPackage(): string

@@ -13,7 +13,12 @@ class DeleteRoleFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'Delete role';
+        return __('Delete role');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Roles');
     }
 
     public function getPackage(): string

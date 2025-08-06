@@ -13,7 +13,12 @@ class ListUsersFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'List users';
+        return __('List users');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Users');
     }
 
     public function getPackage(): string

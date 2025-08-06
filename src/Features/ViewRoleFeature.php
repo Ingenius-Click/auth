@@ -13,7 +13,12 @@ class ViewRoleFeature implements FeatureInterface
 
     public function getName(): string
     {
-        return 'View role';
+        return __('View role');
+    }
+
+    public function getGroup(): string
+    {
+        return __('Roles');
     }
 
     public function getPackage(): string
