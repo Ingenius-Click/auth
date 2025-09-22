@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 use Ingenius\Auth\Models\User;
 
@@ -32,7 +33,7 @@ class TenantAuthController extends Controller
         // If API request, return token
         if ($request->wantsJson()) {
             $token = $user->createToken('auth_token')->plainTextToken;
-            return response()->api(message: 'User registered successfully', data: [
+            return Response::api(message: 'User registered successfully', data: [
                 'user' => $user,
                 'token' => $token,
             ]);
@@ -75,7 +76,7 @@ class TenantAuthController extends Controller
             }
 
             $token = $user->createToken('auth_token')->plainTextToken;
-            return response()->api(message: 'Login successful', data: [
+            return Response::api(message: 'Login successful', data: [
                 'user' => $user,
                 'token' => $token,
             ]);

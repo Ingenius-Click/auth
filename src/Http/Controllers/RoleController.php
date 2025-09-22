@@ -5,6 +5,7 @@ namespace Ingenius\Auth\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Response as ResponseFacade;
 use Illuminate\Routing\Controller;
 use Ingenius\Auth\Helpers\AuthHelper;
 use Ingenius\Auth\Models\Role;
@@ -28,7 +29,7 @@ class RoleController extends Controller
 
         $roles = Role::with('permissions')->get();
 
-        return response()->api(data: $roles, message: 'Roles retrieved successfully');
+        return ResponseFacade::api(data: $roles, message: 'Roles retrieved successfully');
     }
 
     /**
@@ -69,7 +70,7 @@ class RoleController extends Controller
     {
         $role = Role::with('permissions')->findOrFail($id);
 
-        return response()->api(data: $role, message: 'Role retrieved successfully');
+        return ResponseFacade::api(data: $role, message: 'Role retrieved successfully');
     }
 
     /**

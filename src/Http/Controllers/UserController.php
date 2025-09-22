@@ -4,6 +4,7 @@ namespace Ingenius\Auth\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use Ingenius\Auth\Actions\ListUsersAction;
 use Ingenius\Auth\Helpers\AuthHelper;
@@ -23,7 +24,7 @@ class UserController extends Controller
 
         $users = $listUsersAction($request->all());
 
-        return response()->api(data: $users, message: 'Users retrieved successfully');
+        return Response::api(data: $users, message: 'Users retrieved successfully');
     }
 
     public function show(User $user): JsonResponse
@@ -32,7 +33,7 @@ class UserController extends Controller
 
         $this->authorizeForUser($currentUser, 'view', $user);
 
-        return response()->api(data: $user, message: 'User retrieved successfully');
+        return Response::api(data: $user, message: 'User retrieved successfully');
     }
 
     public function update(UserUpdateRequest $request, User $user): JsonResponse
@@ -43,7 +44,7 @@ class UserController extends Controller
 
         $user->update($request->validated());
 
-        return response()->api(data: $user, message: 'User updated successfully');
+        return Response::api(data: $user, message: 'User updated successfully');
     }
 
     public function destroy(User $user): JsonResponse
@@ -54,6 +55,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return response()->api(message: 'User deleted successfully');
+        return Response::api(message: 'User deleted successfully');
     }
 }
