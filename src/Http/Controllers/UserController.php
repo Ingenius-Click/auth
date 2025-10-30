@@ -9,8 +9,10 @@ use Illuminate\Http\Request;
 use Ingenius\Auth\Actions\ListUsersAction;
 use Ingenius\Auth\Helpers\AuthHelper;
 use Ingenius\Auth\Http\Requests\UserUpdateRequest;
+use Ingenius\Auth\Http\Resources\UserResource;
 use Ingenius\Auth\Models\User;
 use Ingenius\Core\Http\Controllers\Controller;
+use Ingenius\Core\Interfaces\HasCustomerProfile;
 
 class UserController extends Controller
 {
@@ -24,7 +26,10 @@ class UserController extends Controller
 
         $users = $listUsersAction($request->all());
 
-        return Response::api(data: $users, message: 'Users retrieved successfully');
+        return Response::api(
+            data: UserResource::collection($users),
+            message: 'Users retrieved successfully'
+        );
     }
 
     public function show(User $user): JsonResponse
@@ -33,7 +38,7 @@ class UserController extends Controller
 
         $this->authorizeForUser($currentUser, 'view', $user);
 
-        return Response::api(data: $user, message: 'User retrieved successfully');
+        return Response::api(data: UserResource::make($user), message: 'User retrieved successfully');
     }
 
     public function update(UserUpdateRequest $request, User $user): JsonResponse
@@ -44,7 +49,15 @@ class UserController extends Controller
 
         $user->update($request->validated());
 
-        return Response::api(data: $user, message: 'User updated successfully');
+        // Update profile if user implements HasCustomerProfile
+        if ($user instanceof HasCustomerProfile) {
+            $profileData = $request->only(['name', 'lastname', 'phone', 'address']);
+            if (!empty(array_filter($profileData))) {
+                $user->updateProfile([...$profileData, 'firstname' => $profileData['name']]);
+            }
+        }
+
+        return Response::api(data: UserResource::make($user->fresh('profile')), message: 'User updated successfully');
     }
 
     public function destroy(User $user): JsonResponse

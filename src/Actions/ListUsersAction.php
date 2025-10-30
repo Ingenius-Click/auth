@@ -10,7 +10,7 @@ class ListUsersAction
 {
     public function __invoke(array $filters): LengthAwarePaginator
     {
-        $query = User::query();
+        $query = User::query()->with('profile');
 
         if (isset($filters['search'])) {
             $query->where('name', 'like', '%' . $filters['search'] . '%');

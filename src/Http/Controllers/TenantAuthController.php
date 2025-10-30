@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
+use Ingenius\Auth\Http\Resources\UserResource;
 use Ingenius\Auth\Models\User;
+use Ingenius\Core\Interfaces\HasCustomerProfile;
 
 class TenantAuthController extends Controller
 {
@@ -18,13 +20,16 @@ class TenantAuthController extends Controller
      */
     public function register(Request $request)
     {
+        $userClass = tenant_user_class();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = User::create([
+
+        $user = $userClass::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -66,7 +71,8 @@ class TenantAuthController extends Controller
             ])->withInput($request->except('password'));
         }
 
-        $user = User::where('email', $request->email)->first();
+        $userClass = tenant_user_class();
+        $user = $userClass::where('email', $request->email)->first();
 
         // If API request, return token
         if ($request->wantsJson()) {
@@ -122,9 +128,11 @@ class TenantAuthController extends Controller
      */
     public function user(Request $request)
     {
-        return response()->json([
-            'status' => 'success',
-            'user' => Auth::guard('tenant')->user(),
-        ]);
+        return Response::api(
+            data: new UserResource(
+            Auth::guard('tenant')->user()
+            ),
+            message: 'User retrieved successfully'
+        );
     }
 }

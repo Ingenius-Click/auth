@@ -13,10 +13,23 @@ class UserUpdateRequest extends FormRequest
 
     public function rules(): array
     {
+        $userClass = tenant_user_class();
+
+        $extraRules = [];
+
+        if((new \ReflectionClass($userClass))->implementsInterface(\Ingenius\Core\Interfaces\HasCustomerProfile::class)) {
+            $extraRules = [
+                'lastname' => ['nullable', 'string', 'max:255'],
+                'phone' => ['nullable', 'string', 'max:20'],
+                'address' => ['nullable', 'string', 'max:500'],
+            ];
+        }
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $this->user->id],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            ... $extraRules,
         ];
     }
 }
