@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 use Ingenius\Auth\Http\Resources\UserResource;
 use Ingenius\Auth\Models\User;
+use Ingenius\Core\Helpers\AuthHelper;
 use Ingenius\Core\Interfaces\HasCustomerProfile;
 
 class TenantAuthController extends Controller
@@ -128,10 +129,14 @@ class TenantAuthController extends Controller
      */
     public function user(Request $request)
     {
+        $user = AuthHelper::getUser();
+
         return Response::api(
-            data: new UserResource(
-            Auth::guard('tenant')->user()
-            ),
+            data: [
+                'user' => new UserResource(
+            $user
+            )
+            ],
             message: 'User retrieved successfully'
         );
     }

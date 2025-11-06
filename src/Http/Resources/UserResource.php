@@ -27,14 +27,11 @@ class UserResource extends JsonResource
 
         // If user implements HasCustomerProfile, include profile data
         if ($this->resource instanceof HasCustomerProfile) {
-            $data['profile'] = [
-                'firstname' => $this->resource->getFirstName(),
+            $data = array_merge($data, [
                 'lastname' => $this->resource->getLastName(),
                 'phone' => $this->resource->getPhone(),
                 'address' => $this->resource->getAddress(),
-                'full_name' => $this->resource->getFullName(),
-                'is_complete' => $this->resource->hasCompleteProfile(),
-            ];
+            ]);
         }
 
         return $data;
