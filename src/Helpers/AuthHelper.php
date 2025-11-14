@@ -66,4 +66,17 @@ class AuthHelper
     {
         return Auth::guard($guard)->user();
     }
+
+    public static function checkPermission(string $permission) {
+        $user = AuthHelper::getUser();
+        $userClass = tenant_user_class();
+
+        if ($user && is_object($user) && is_a($user, $userClass)) {
+            if(!$user->can($permission)) {
+                abort(403);
+            }
+        } else {
+            abort(403);
+        }
+    }
 }
