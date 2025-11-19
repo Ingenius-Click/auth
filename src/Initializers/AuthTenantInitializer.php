@@ -108,11 +108,12 @@ class AuthTenantInitializer implements TenantInitializer
         $permissions = $this->permissionsManager->tenant();
 
         foreach ($permissions as $permissionName => $permissionData) {
-            Permission::firstOrCreate([
+            Permission::updateOrCreate([
                 'name' => $permissionName,
                 'guard_name' => 'tenant',
             ], [
-                'description' => $permissionData['description'],
+                'display_name' => $permissionData['display_name'],
+                'group' => $permissionData['group'],
             ]);
         }
     }
