@@ -131,26 +131,97 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->app->afterResolving(PermissionsManager::class, function (PermissionsManager $manager) {
             // Register user permissions
-            $manager->registerMany([
-                AuthPermissions::USERS_VIEW => 'View users',
-                AuthPermissions::USERS_CREATE => 'Create users',
-                AuthPermissions::USERS_EDIT => 'Edit users',
-                AuthPermissions::USERS_DELETE => 'Delete users',
-            ], 'Users', 'tenant');
+            $manager->register(
+                AuthPermissions::USERS_VIEW,
+                'View users',
+                'Auth',
+                'tenant',
+                'View users',
+                'Users'
+            );
+
+            $manager->register(
+                AuthPermissions::USERS_CREATE,
+                'Create users',
+                'Auth',
+                'tenant',
+                'Create users',
+                'Users'
+            );
+
+            $manager->register(
+                AuthPermissions::USERS_EDIT,
+                'Edit users',
+                'Auth',
+                'tenant',
+                'Edit users',
+                'Users'
+            );
+
+            $manager->register(
+                AuthPermissions::USERS_DELETE,
+                'Delete users',
+                'Auth',
+                'tenant',
+                'Delete users',
+                'Users'
+            );
 
             // Register role permissions
-            $manager->registerMany([
-                AuthPermissions::ROLES_VIEW => 'View roles',
-                AuthPermissions::ROLES_CREATE => 'Create roles',
-                AuthPermissions::ROLES_EDIT => 'Edit roles',
-                AuthPermissions::ROLES_DELETE => 'Delete roles',
-            ], 'Roles', 'tenant');
+            $manager->register(
+                AuthPermissions::ROLES_VIEW,
+                'View roles',
+                'Auth',
+                'tenant',
+                'View roles',
+                'Roles'
+            );
+
+            $manager->register(
+                AuthPermissions::ROLES_CREATE,
+                'Create roles',
+                'Auth',
+                'tenant',
+                'Create roles',
+                'Roles'
+            );
+
+            $manager->register(
+                AuthPermissions::ROLES_EDIT,
+                'Edit roles',
+                'Auth',
+                'tenant',
+                'Edit roles',
+                'Roles'
+            );
+
+            $manager->register(
+                AuthPermissions::ROLES_DELETE,
+                'Delete roles',
+                'Auth',
+                'tenant',
+                'Delete roles',
+                'Roles'
+            );
 
             // Register permission management permissions
-            $manager->registerMany([
-                AuthPermissions::PERMISSIONS_VIEW => 'View permissions',
-                AuthPermissions::PERMISSIONS_ASSIGN => 'Assign permissions',
-            ], 'Permissions', 'tenant');
+            $manager->register(
+                AuthPermissions::PERMISSIONS_VIEW,
+                'View permissions',
+                'Auth',
+                'tenant',
+                'View permissions',
+                'Permissions'
+            );
+
+            $manager->register(
+                AuthPermissions::PERMISSIONS_ASSIGN,
+                'Assign permissions',
+                'Auth',
+                'tenant',
+                'Assign permissions',
+                'Permissions'
+            );
         });
     }
 
