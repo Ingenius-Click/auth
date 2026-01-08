@@ -2,6 +2,7 @@
 
 namespace Ingenius\Auth\Http\Controllers;
 
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -36,18 +37,23 @@ class TenantAuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // If API request, return token
+        // Trigger the Registered event (Laravel will automatically send verification email if MustVerifyEmail is implemented)
+        event(new Registered($user));
+
+        // If API request, return response (no token until email is verified)
         if ($request->wantsJson()) {
-            $token = $user->createToken('auth_token')->plainTextToken;
-            return Response::api(message: 'User registered successfully', data: [
-                'user' => $user,
-                'token' => $token,
-            ]);
+            return Response::api(
+                message: 'Registration successful! Please check your email to verify your account before logging in.',
+                data: [
+                    'email' => $user->email,
+                    'email_verified' => $user->hasVerifiedEmail(),
+                ],
+                code: 201
+            );
         }
 
-        // If web request, log the user in and redirect
-        Auth::guard('tenant')->login($user);
-        return redirect()->intended(route('tenant.dashboard'));
+        // If web request, redirect to verification notice
+        return redirect()->route('verification.notice');
     }
 
     /**
@@ -74,6 +80,24 @@ class TenantAuthController extends Controller
 
         $userClass = tenant_user_class();
         $user = $userClass::where('email', $request->email)->first();
+
+        // Check if email verification is required
+        if (method_exists($user, 'hasVerifiedEmail') && !$user->hasVerifiedEmail()) {
+            // Logout the user
+            Auth::guard('tenant')->logout();
+
+            if ($request->wantsJson()) {
+                return Response::api(
+                    message: 'Your email address is not verified. Please check your email for a verification link.',
+                    data: ['email_verified' => false],
+                    code: 403
+                );
+            }
+
+            return back()->withErrors([
+                'email' => 'Please verify your email address before logging in.',
+            ])->withInput($request->except('password'));
+        }
 
         // If API request, return token
         if ($request->wantsJson()) {

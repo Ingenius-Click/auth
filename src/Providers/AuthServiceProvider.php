@@ -25,6 +25,7 @@ use Ingenius\Auth\Models\User;
 use Ingenius\Auth\Policies\PermissionPolicy;
 use Ingenius\Auth\Policies\RolePolicy;
 use Ingenius\Auth\Policies\UserPolicy;
+use Illuminate\Support\Facades\Config;
 use Ingenius\Core\Services\FeatureManager;
 use Ingenius\Core\Support\PermissionsManager;
 use Ingenius\Core\Support\TenantInitializationManager;
@@ -55,6 +56,9 @@ class AuthServiceProvider extends ServiceProvider
         // Register the route service provider
         $this->app->register(RouteServiceProvider::class);
 
+        // Register settings classes
+        $this->registerSettingsClasses();
+
         $this->app->afterResolving(FeatureManager::class, function (FeatureManager $manager) {
             $manager->register(new ListUsersFeature());
             $manager->register(new ViewUserFeature());
@@ -84,11 +88,15 @@ class AuthServiceProvider extends ServiceProvider
             $this->registerTenantMigrations($tenantMigrationsPath, 'auth');
         }
 
+        // Register translations
+        $this->loadTranslationsFrom(__DIR__ . '/../../lang', 'auth');
+
         // Register commands
         if ($this->app->runningInConsole()) {
             $this->commands([
                 SyncTenantPermissionsCommand::class,
                 AddAdminRoleToUserCommand::class,
+                \Ingenius\Auth\Console\Commands\SetupEmailVerificationCommand::class,
             ]);
 
             $this->publishes([
@@ -98,6 +106,10 @@ class AuthServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../database/migrations' => database_path('migrations/ingenius/auth'),
             ], 'ingenius-auth-migrations');
+
+            $this->publishes([
+                __DIR__ . '/../../lang' => lang_path('vendor/auth'),
+            ], 'ingenius-auth-translations');
         }
 
         // Register middlewares
@@ -244,5 +256,23 @@ class AuthServiceProvider extends ServiceProvider
             $initializer = $this->app->make(AuthTenantInitializer::class);
             $manager->register($initializer);
         });
+    }
+
+    /**
+     * Register settings classes with the core settings system.
+     */
+    protected function registerSettingsClasses(): void
+    {
+        // Get existing settings classes from core config
+        $coreSettingsClasses = Config::get('settings.settings_classes', []);
+
+        // Get auth settings classes
+        $authSettingsClasses = Config::get('ingenius.auth.settings_classes', []);
+
+        // Merge and update the core settings classes
+        $mergedSettingsClasses = array_merge($coreSettingsClasses, $authSettingsClasses);
+
+        // Update the core settings config
+        Config::set('settings.settings_classes', $mergedSettingsClasses);
     }
 }

@@ -42,4 +42,16 @@ return [
             'description' => 'Regular user with limited permissions',
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings Classes
+    |--------------------------------------------------------------------------
+    |
+    | Here you can register settings classes for the auth package.
+    |
+    */
+    'settings_classes' => [
+        \Ingenius\Auth\Settings\AuthSettings::class,
+    ],
 ];
