@@ -27,7 +27,16 @@ class TenantAuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#._\-])[A-Za-z\d@$!%*?&#._\-]+$/'
+            ],
+        ], [
+            'password.regex' => __('auth::validation.password.complexity'),
+            'password.min' => __('auth::validation.password.min'),
         ]);
 
 
