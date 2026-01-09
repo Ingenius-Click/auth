@@ -95,16 +95,21 @@ class TenantAuthController extends Controller
             // Logout the user
             Auth::guard('tenant')->logout();
 
+            // Resend verification email
+            if (method_exists($user, 'sendEmailVerificationNotification')) {
+                $user->sendEmailVerificationNotification();
+            }
+
             if ($request->wantsJson()) {
                 return Response::api(
-                    message: 'Your email address is not verified. Please check your email for a verification link.',
+                    message: 'Your email address is not verified. A new verification link has been sent to your email.',
                     data: ['email_verified' => false],
                     code: 403
                 );
             }
 
             return back()->withErrors([
-                'email' => 'Please verify your email address before logging in.',
+                'email' => 'Please verify your email address before logging in. A new verification link has been sent to your email.',
             ])->withInput($request->except('password'));
         }
 
