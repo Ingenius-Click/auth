@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Ingenius\Auth\Http\Controllers\PermissionController;
@@ -9,6 +10,7 @@ use Ingenius\Auth\Http\Controllers\RoleController;
 use Ingenius\Auth\Http\Controllers\TenantAuthController;
 use Ingenius\Auth\Http\Controllers\UserController;
 use Ingenius\Auth\Http\Requests\TenantEmailVerificationRequest;
+use Ingenius\Auth\Mail\TestQueuedEmail;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +31,32 @@ Route::prefix('auth')->name('auth.')->middleware('web')->group(function () {
 Route::prefix('api')->middleware(['api'])->group(function () {
     Route::post('/login', [TenantAuthController::class, 'login']);
     Route::post('/register', [TenantAuthController::class, 'register']);
+
+    // Test endpoint for queued emails (protected route)
+    Route::post('/test-queue-email', function (Request $request) {
+        $request->validate([
+            'email' => 'required|email',
+            'message' => 'nullable|string|max:500',
+        ]);
+
+        $email = $request->input('email');
+        $message = $request->input('message', 'Testing queue from production server');
+
+        // Queue the test email
+        Mail::to($email)->queue(new TestQueuedEmail($message));
+
+        return Response::api(
+            data: [
+                'queued' => true,
+                'email' => $email,
+                'message' => 'Test email has been queued successfully. Check your email inbox and the jobs table.',
+                'queue_connection' => config('queue.default'),
+                'mail_driver' => config('mail.default'),
+            ],
+            message: 'Test email queued successfully',
+            code: 200
+        );
+    })->middleware(['throttle:10,1']);
 
     // Email Verification Routes
     Route::prefix('email')->group(function () {
