@@ -3,10 +3,12 @@
 namespace Ingenius\Auth\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Ingenius\Auth\Rules\PasswordRegex;
+use Ingenius\Core\Helpers\AuthHelper;
 
-class UserStoreRequest extends FormRequest
+class UserUpdateOwnDataRequest extends FormRequest
 {
+    protected $user;
+    
     public function authorize(): bool
     {
         return true;
@@ -14,7 +16,11 @@ class UserStoreRequest extends FormRequest
 
     public function rules(): array
     {
+        $logged = AuthHelper::getUser();
+
         $userClass = tenant_user_class();
+
+        $this->user = $userClass::find($logged->id);
 
         $extraRules = [];
 
@@ -28,11 +34,12 @@ class UserStoreRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed', new PasswordRegex()],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['required', 'numeric', 'exists:roles,id'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $this->user->id],
             ... $extraRules,
         ];
+    }
+
+    public function loggedUser(){
+        return $this->user;
     }
 }

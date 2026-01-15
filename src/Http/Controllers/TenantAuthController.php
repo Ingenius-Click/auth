@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 use Ingenius\Auth\Http\Resources\UserResource;
 use Ingenius\Auth\Models\User;
+use Ingenius\Auth\Rules\PasswordRegex;
 use Ingenius\Core\Helpers\AuthHelper;
 use Ingenius\Core\Interfaces\HasCustomerProfile;
 
@@ -32,10 +33,9 @@ class TenantAuthController extends Controller
                 'string',
                 'min:8',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#._\-])[A-Za-z\d@$!%*?&#._\-]+$/'
+                new PasswordRegex()
             ],
         ], [
-            'password.regex' => __('auth::validation.password.complexity'),
             'password.min' => __('auth::validation.password.min'),
         ]);
 

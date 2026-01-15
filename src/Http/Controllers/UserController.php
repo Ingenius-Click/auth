@@ -7,11 +7,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use Ingenius\Auth\Actions\ListUsersAction;
-use Ingenius\Auth\Helpers\AuthHelper;
+use Ingenius\Auth\Http\Requests\UserChangePasswordRequest;
 use Ingenius\Auth\Http\Requests\UserStoreRequest;
+use Ingenius\Auth\Http\Requests\UserUpdateOwnDataRequest;
 use Ingenius\Auth\Http\Requests\UserUpdateRequest;
 use Ingenius\Auth\Http\Resources\UserResource;
 use Ingenius\Auth\Models\User;
+use Ingenius\Core\Helpers\AuthHelper;
 use Ingenius\Core\Http\Controllers\Controller;
 use Ingenius\Core\Interfaces\HasCustomerProfile;
 
@@ -55,11 +57,12 @@ class UserController extends Controller
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
+            'email_verified_at' => now(),
         ]);
 
         // Create profile if user implements HasCustomerProfile
         if ($user instanceof HasCustomerProfile) {
-            $profileData = $request->only(['name', 'lastname', 'phone', 'address']);
+            $profileData = $request->only(['lastname', 'phone', 'address']);
             if (!empty(array_filter($profileData))) {
                 $user->updateProfile([...$profileData, 'firstname' => $profileData['name']]);
             }
@@ -106,6 +109,51 @@ class UserController extends Controller
         }
 
         return Response::api(data: UserResource::make($user->fresh('profile')), message: 'User updated successfully');
+    }
+
+    public function updateOwnProfile(UserUpdateOwnDataRequest $request): JsonResponse {
+
+        $user = $request->loggedUser();
+
+        $user->update($request->validated());
+
+        // Update profile if user implements HasCustomerProfile
+        if ($user instanceof HasCustomerProfile) {
+            $profileData = $request->only(['name', 'lastname', 'phone', 'address']);
+            if (!empty(array_filter($profileData))) {
+                $user->updateProfile([...$profileData, 'firstname' => $profileData['name']]);
+            }
+        }
+
+        return Response::api(data: UserResource::make($user->fresh('profile')), message: 'User updated successfully');
+    }
+
+    public function changePassword(UserChangePasswordRequest $request): JsonResponse
+    {
+        $user = $request->loggedUser();
+
+        $user->update([
+            'password' => bcrypt($request->input('new_password'))
+        ]);
+
+        return Response::api(data: null, message: 'Password changed successfully');
+    }
+
+    public function deleteOwnAccount(): JsonResponse
+    {
+        $user = AuthHelper::getUser();
+
+        $userClass = tenant_user_class();
+        $userModel = $userClass::find($user->getAuthIdentifier());
+
+        if (!$userModel) {
+            return Response::api(data: null, message: 'User not found', code: 404);
+        }
+
+        // This will trigger soft delete and anonymization via the AnonymizesUserData trait
+        $userModel->delete();
+
+        return Response::api(data: null, message: 'Your account has been deleted successfully');
     }
 
     public function destroy(User $user): JsonResponse
