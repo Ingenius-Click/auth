@@ -99,6 +99,7 @@ Route::prefix('api')->middleware(['api'])->group(function () {
 
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index'])->middleware('tenant.has.feature:list-users');
+            Route::post('/', [UserController::class, 'store'])->middleware('tenant.has.feature:create-user');
             Route::get('/{user}', [UserController::class, 'show'])->middleware('tenant.has.feature:view-user');
             Route::put('/{user}', [UserController::class, 'update'])->middleware('tenant.has.feature:update-user');
             Route::delete('/{user}', [UserController::class, 'destroy'])->middleware('tenant.has.feature:delete-user');

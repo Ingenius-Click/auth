@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use Ingenius\Auth\Actions\ListUsersAction;
 use Ingenius\Auth\Helpers\AuthHelper;
+use Ingenius\Auth\Http\Requests\UserStoreRequest;
 use Ingenius\Auth\Http\Requests\UserUpdateRequest;
 use Ingenius\Auth\Http\Resources\UserResource;
 use Ingenius\Auth\Models\User;
@@ -41,6 +42,40 @@ class UserController extends Controller
         return Response::api(data: UserResource::make($user), message: 'User retrieved successfully');
     }
 
+    public function store(UserStoreRequest $request): JsonResponse
+    {
+        $currentUser = AuthHelper::getUser();
+
+        $this->authorizeForUser($currentUser, 'create', User::class);
+
+        $userClass = tenant_user_class();
+
+        // Create the user
+        $user = $userClass::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password')),
+        ]);
+
+        // Create profile if user implements HasCustomerProfile
+        if ($user instanceof HasCustomerProfile) {
+            $profileData = $request->only(['name', 'lastname', 'phone', 'address']);
+            if (!empty(array_filter($profileData))) {
+                $user->updateProfile([...$profileData, 'firstname' => $profileData['name']]);
+            }
+        }
+
+        // Assign roles if provided
+        if ($request->has('roles')) {
+            $roles = $request->input('roles');
+            if ($roles && is_array($roles) && count($roles) > 0) {
+                $user->syncRoles($roles);
+            }
+        }
+
+        return Response::api(data: UserResource::make($user->fresh('profile')), message: 'User created successfully', code: 201);
+    }
+
     public function update(UserUpdateRequest $request, User $user): JsonResponse
     {
         $currentUser = AuthHelper::getUser();
@@ -54,6 +89,19 @@ class UserController extends Controller
             $profileData = $request->only(['name', 'lastname', 'phone', 'address']);
             if (!empty(array_filter($profileData))) {
                 $user->updateProfile([...$profileData, 'firstname' => $profileData['name']]);
+            }
+        }
+
+        // Handle roles assignment
+        if ($request->has('roles')) {
+            $newRoles = $request->input('roles');
+
+            if ($newRoles && is_array($newRoles) && count($newRoles) > 0) {
+                // Remove all existing roles and assign the new ones
+                $user->syncRoles($newRoles);
+            } else {
+                // If roles is null or empty array, remove all roles
+                $user->syncRoles([]);
             }
         }
 

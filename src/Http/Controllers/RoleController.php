@@ -122,9 +122,7 @@ class RoleController extends Controller
 
         $role->delete();
 
-        return response()->json([
-            'message' => 'Role deleted successfully'
-        ]);
+        return ResponseFacade::api(message: __('Role deleted successfully'));
     }
 
     /**
@@ -132,8 +130,9 @@ class RoleController extends Controller
      */
     public function getPermissions()
     {
-        return response()->json([
-            'permissions' => $this->permissionsManager->all()
-        ]);
+        return ResponseFacade::api(
+            message: __('Permissions retrieved successfully'),
+            data: $this->permissionsManager->all('tenant'),
+        );
     }
 }

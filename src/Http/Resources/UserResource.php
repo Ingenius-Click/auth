@@ -23,6 +23,8 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'roles' => $this->roles()->without('permissions')->get(),
+            'permissions' => $this->getAllPermissions(),
         ];
 
         // If user implements HasCustomerProfile, include profile data
@@ -33,6 +35,7 @@ class UserResource extends JsonResource
                 'address' => $this->resource->getAddress(),
             ]);
         }
+
 
         return $data;
     }

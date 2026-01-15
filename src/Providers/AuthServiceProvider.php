@@ -8,6 +8,7 @@ use Ingenius\Auth\Console\Commands\AddAdminRoleToUserCommand;
 use Ingenius\Auth\Console\Commands\SyncTenantPermissionsCommand;
 use Ingenius\Auth\Constants\AuthPermissions;
 use Ingenius\Auth\Features\CreateRoleFeature;
+use Ingenius\Auth\Features\CreateUserFeature;
 use Ingenius\Auth\Features\DeleteRoleFeature;
 use Ingenius\Auth\Features\DeleteUserFeature;
 use Ingenius\Auth\Features\ListPermissionsFeature;
@@ -61,6 +62,7 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app->afterResolving(FeatureManager::class, function (FeatureManager $manager) {
             $manager->register(new ListUsersFeature());
+            $manager->register(new CreateUserFeature());
             $manager->register(new ViewUserFeature());
             $manager->register(new UpdateUserFeature());
             $manager->register(new DeleteUserFeature());
