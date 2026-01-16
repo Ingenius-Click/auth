@@ -27,10 +27,12 @@ class UserController extends Controller
 
         $this->authorizeForUser($user, 'viewAny', User::class);
 
-        $users = $listUsersAction($request->all());
+        $paginated = $listUsersAction($request->all());
+
+        $paginatedTransformed = $paginated->through(fn ($user) => new UserResource($user));
 
         return Response::api(
-            data: UserResource::collection($users),
+            data: $paginatedTransformed,
             message: 'Users retrieved successfully'
         );
     }

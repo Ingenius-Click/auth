@@ -12,10 +12,6 @@ class ListUsersAction
     {
         $query = User::query()->with('profile');
 
-        if (isset($filters['search'])) {
-            $query->where('name', 'like', '%' . $filters['search'] . '%');
-        }
-
-        return $query->paginate($filters['per_page'] ?? 10);
+        return table_handler_paginate($filters, $query);
     }
 }
