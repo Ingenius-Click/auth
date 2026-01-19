@@ -32,32 +32,6 @@ Route::prefix('api')->middleware(['api'])->group(function () {
     Route::post('/login', [TenantAuthController::class, 'login']);
     Route::post('/register', [TenantAuthController::class, 'register']);
 
-    // Test endpoint for queued emails (protected route)
-    Route::post('/test-queue-email', function (Request $request) {
-        $request->validate([
-            'email' => 'required|email',
-            'message' => 'nullable|string|max:500',
-        ]);
-
-        $email = $request->input('email');
-        $message = $request->input('message', 'Testing queue from production server');
-
-        // Queue the test email
-        Mail::to($email)->queue(new TestQueuedEmail($message));
-
-        return Response::api(
-            data: [
-                'queued' => true,
-                'email' => $email,
-                'message' => 'Test email has been queued successfully. Check your email inbox and the jobs table.',
-                'queue_connection' => config('queue.default'),
-                'mail_driver' => config('mail.default'),
-            ],
-            message: 'Test email queued successfully',
-            code: 200
-        );
-    })->middleware(['throttle:10,1']);
-
     // Email Verification Routes
     Route::prefix('email')->group(function () {
         // Verification notice (for users who need to verify)
@@ -85,9 +59,17 @@ Route::prefix('api')->middleware(['api'])->group(function () {
                 );
             }
 
-            // Get redirect URL from tenant settings
+            // Get source from query parameter (store or backoffice)
+            $source = $request->query('source', 'store');
+
+            // Get redirect URL from tenant settings based on source
             $authSettings = \Ingenius\Auth\Settings\AuthSettings::make();
-            $redirectUrl = $authSettings->email_verification_redirect_url;
+
+            if ($source === 'backoffice') {
+                $redirectUrl = $authSettings->backoffice_email_verification_redirect_url;
+            } else {
+                $redirectUrl = $authSettings->email_verification_redirect_url;
+            }
 
             // If no custom URL is set, use default frontend URL
             if (empty($redirectUrl)) {
@@ -95,7 +77,7 @@ Route::prefix('api')->middleware(['api'])->group(function () {
             }
 
             return redirect($redirectUrl);
-        })->middleware(['signed:tenant'])->name('verification.verify'); // Ignore 'tenant' param in signature validation
+        })->middleware(['signed:tenant,source'])->name('verification.verify'); // Ignore 'tenant' and 'source' params in signature validation
 
         // Resend verification email
         Route::post('/verification-notification', function (Request $request) {
@@ -107,7 +89,9 @@ Route::prefix('api')->middleware(['api'])->group(function () {
                 );
             }
 
-            $request->user()->sendEmailVerificationNotification();
+            // Get source from request (store or backoffice)
+            $source = $request->input('source', 'store');
+            $request->user()->sendEmailVerificationNotification($source);
 
             if ($request->wantsJson()) {
                 return Response::api(

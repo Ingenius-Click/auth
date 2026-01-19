@@ -22,9 +22,10 @@ trait MustVerifyEmailForTenant
     /**
      * Send the email verification notification.
      *
+     * @param  string  $source  The source of the request (store or backoffice)
      * @return void
      */
-    public function sendEmailVerificationNotification()
+    public function sendEmailVerificationNotification(string $source = 'store')
     {
         // Prevent duplicate emails in the same request with tenant-scoped cache key
         $tenant = tenant();
@@ -35,7 +36,7 @@ trait MustVerifyEmailForTenant
             return;
         }
 
-        $this->notify(new TenantVerifyEmail);
+        $this->notify(new TenantVerifyEmail($source));
 
         // Cache for 5 seconds to prevent duplicates in same request cycle
         cache()->put($cacheKey, true, 5);

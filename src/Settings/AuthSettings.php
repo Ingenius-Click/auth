@@ -14,6 +14,8 @@ class AuthSettings extends Settings
      */
     public string $email_verification_redirect_url = '';
 
+    public string $backoffice_email_verification_redirect_url = '';
+
     /**
      * URL to redirect users after successful password reset.
      * This should be a full URL including the protocol (e.g., https://example.com/login).

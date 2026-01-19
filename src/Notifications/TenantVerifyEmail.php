@@ -9,6 +9,19 @@ use Illuminate\Support\Facades\URL;
 class TenantVerifyEmail extends BaseVerifyEmail
 {
     /**
+     * The source of the verification request (store or backoffice).
+     */
+    protected string $source;
+
+    /**
+     * Create a new notification instance.
+     */
+    public function __construct(string $source = 'store')
+    {
+        $this->source = $source;
+    }
+
+    /**
      * Get the verification URL for the given notifiable.
      *
      * @param  mixed  $notifiable
@@ -62,9 +75,10 @@ class TenantVerifyEmail extends BaseVerifyEmail
         // Restore original APP_URL
         config(['app.url' => $originalUrl]);
 
-        // Add tenant query parameter for reliable tenant identification
+        // Add tenant and source query parameters
         $separator = str_contains($verificationUrl, '?') ? '&' : '?';
         $verificationUrl .= $separator . 'tenant=' . urlencode($tenantDomain);
+        $verificationUrl .= '&source=' . urlencode($this->source);
 
         return $verificationUrl;
     }

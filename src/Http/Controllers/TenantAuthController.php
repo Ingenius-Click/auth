@@ -3,6 +3,7 @@
 namespace Ingenius\Auth\Http\Controllers;
 
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -79,11 +80,11 @@ class TenantAuthController extends Controller
         if (!Auth::guard('tenant')->attempt($request->only('email', 'password'))) {
             if ($request->wantsJson()) {
                 throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
+                    'email' => [__('auth::verification.credentials_not_match')],
                 ]);
             }
             return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
+                'email' => __('auth::verification.credentials_not_match'),
             ])->withInput($request->except('password'));
         }
 
@@ -91,25 +92,28 @@ class TenantAuthController extends Controller
         $user = $userClass::where('email', $request->email)->first();
 
         // Check if email verification is required
-        if (method_exists($user, 'hasVerifiedEmail') && !$user->hasVerifiedEmail()) {
+        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
             // Logout the user
             Auth::guard('tenant')->logout();
 
-            // Resend verification email
+            // Get source from request (store or backoffice)
+            $source = $request->input('source', 'store');
+
+            // Resend verification email with source
             if (method_exists($user, 'sendEmailVerificationNotification')) {
-                $user->sendEmailVerificationNotification();
+                $user->sendEmailVerificationNotification($source);
             }
 
             if ($request->wantsJson()) {
                 return Response::api(
-                    message: 'Your email address is not verified. A new verification link has been sent to your email.',
+                    message: __('auth::verification.not_verified'),
                     data: ['email_verified' => false],
                     code: 403
                 );
             }
 
             return back()->withErrors([
-                'email' => 'Please verify your email address before logging in. A new verification link has been sent to your email.',
+                'email' => __('auth::verification.not_verified'),
             ])->withInput($request->except('password'));
         }
 

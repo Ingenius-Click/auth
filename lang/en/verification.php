@@ -8,4 +8,6 @@ return [
     'line_2' => 'This verification link will expire in :minutes minutes.',
     'line_3' => 'If you did not create an account, no further action is required.',
     'salutation' => 'Regards',
+    'not_verified' => 'Your email address is not verified. A new verification link has been sent to your email.',
+    'credentials_not_match' => 'The provided credentials do not match our records.',
 ];

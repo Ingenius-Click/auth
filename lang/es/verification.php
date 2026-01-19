@@ -8,4 +8,6 @@ return [
     'line_2' => 'Este enlace de verificación expirará en :minutes minutos.',
     'line_3' => 'Si no creaste una cuenta, no es necesaria ninguna acción adicional.',
     'salutation' => 'Saludos',
+    'not_verified' => 'Tu correo electrónico no está verificado. Se ha enviado un nuevo enlace de verificación a tu correo.',
+    'credentials_not_match' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
 ];
