@@ -150,8 +150,8 @@ class AuthServiceProvider extends ServiceProvider
                 'View users',
                 'Auth',
                 'tenant',
-                'View users',
-                'Users'
+                __('auth::permissions.display_names.view_users'),
+                __('auth::permissions.groups.users')
             );
 
             $manager->register(
@@ -159,8 +159,8 @@ class AuthServiceProvider extends ServiceProvider
                 'Create users',
                 'Auth',
                 'tenant',
-                'Create users',
-                'Users'
+                __('auth::permissions.display_names.create_users'),
+                __('auth::permissions.groups.users')
             );
 
             $manager->register(
@@ -168,8 +168,8 @@ class AuthServiceProvider extends ServiceProvider
                 'Edit users',
                 'Auth',
                 'tenant',
-                'Edit users',
-                'Users'
+                __('auth::permissions.display_names.edit_users'),
+                __('auth::permissions.groups.users')
             );
 
             $manager->register(
@@ -177,8 +177,8 @@ class AuthServiceProvider extends ServiceProvider
                 'Delete users',
                 'Auth',
                 'tenant',
-                'Delete users',
-                'Users'
+                __('auth::permissions.display_names.delete_users'),
+                __('auth::permissions.groups.users')
             );
 
             // Register role permissions
@@ -187,8 +187,8 @@ class AuthServiceProvider extends ServiceProvider
                 'View roles',
                 'Auth',
                 'tenant',
-                'View roles',
-                'Roles'
+                __('auth::permissions.display_names.view_roles'),
+                __('auth::permissions.groups.roles')
             );
 
             $manager->register(
@@ -196,8 +196,8 @@ class AuthServiceProvider extends ServiceProvider
                 'Create roles',
                 'Auth',
                 'tenant',
-                'Create roles',
-                'Roles'
+                __('auth::permissions.display_names.create_roles'),
+                __('auth::permissions.groups.roles')
             );
 
             $manager->register(
@@ -205,8 +205,8 @@ class AuthServiceProvider extends ServiceProvider
                 'Edit roles',
                 'Auth',
                 'tenant',
-                'Edit roles',
-                'Roles'
+                __('auth::permissions.display_names.edit_roles'),
+                __('auth::permissions.groups.roles')
             );
 
             $manager->register(
@@ -214,8 +214,8 @@ class AuthServiceProvider extends ServiceProvider
                 'Delete roles',
                 'Auth',
                 'tenant',
-                'Delete roles',
-                'Roles'
+                __('auth::permissions.display_names.delete_roles'),
+                __('auth::permissions.groups.roles')
             );
 
             // Register permission management permissions
@@ -224,8 +224,8 @@ class AuthServiceProvider extends ServiceProvider
                 'View permissions',
                 'Auth',
                 'tenant',
-                'View permissions',
-                'Permissions'
+                __('auth::permissions.display_names.view_permissions'),
+                __('auth::permissions.groups.permissions')
             );
 
             $manager->register(
@@ -233,8 +233,8 @@ class AuthServiceProvider extends ServiceProvider
                 'Assign permissions',
                 'Auth',
                 'tenant',
-                'Assign permissions',
-                'Permissions'
+                __('auth::permissions.display_names.assign_permissions'),
+                __('auth::permissions.groups.permissions')
             );
         });
     }
