@@ -2,21 +2,23 @@
 
 namespace Ingenius\Auth\Models;
 
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Ingenius\Auth\Traits\AnonymizesUserData;
+use Ingenius\Auth\Traits\CanResetPasswordForTenant;
 use Ingenius\Auth\Traits\MustVerifyEmailForTenant;
 use Ingenius\Core\Interfaces\HasCustomerProfile;
 use Ingenius\Core\Traits\HasCustomerProfileTrait;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasCustomerProfile, MustVerifyEmail
+class User extends Authenticatable implements HasCustomerProfile, MustVerifyEmail, CanResetPassword
 {
-    use HasApiTokens, HasFactory, HasRoles, Notifiable, HasCustomerProfileTrait, MustVerifyEmailForTenant, SoftDeletes, AnonymizesUserData;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, HasCustomerProfileTrait, MustVerifyEmailForTenant, CanResetPasswordForTenant, SoftDeletes, AnonymizesUserData;
 
     /**
      * The attributes that are mass assignable.

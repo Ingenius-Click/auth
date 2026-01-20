@@ -5,7 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+use Ingenius\Auth\Http\Controllers\ForgotPasswordController;
 use Ingenius\Auth\Http\Controllers\PermissionController;
+use Ingenius\Auth\Http\Controllers\ResetPasswordController;
 use Ingenius\Auth\Http\Controllers\RoleController;
 use Ingenius\Auth\Http\Controllers\TenantAuthController;
 use Ingenius\Auth\Http\Controllers\UserController;
@@ -102,6 +104,18 @@ Route::prefix('api')->middleware(['api'])->group(function () {
 
             return back()->with('message', 'Verification link sent!');
         })->middleware(['tenant.user', 'throttle:6,1'])->name('verification.send');
+    });
+
+    // Password Reset Routes
+    Route::prefix('password')->group(function () {
+        // Send password reset link
+        Route::post('/forgot', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+            ->middleware(['throttle:6,1'])
+            ->name('password.email');
+
+        // Reset password
+        Route::post('/reset', [ResetPasswordController::class, 'reset'])
+            ->name('password.reset');
     });
 
     // Protected API Routes
