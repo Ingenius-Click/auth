@@ -36,6 +36,7 @@ class TenantAuthController extends Controller
                 'confirmed',
                 new PasswordRegex()
             ],
+            'lastname' => 'nullable|string|max:255',
         ], [
             'password.min' => __('auth::validation.password.min'),
         ]);
@@ -46,6 +47,14 @@ class TenantAuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Save lastname to profile if provided and user implements HasCustomerProfile
+        if ($request->filled('lastname') && $user instanceof HasCustomerProfile) {
+            $user->updateProfile([
+                'firstname' => $request->name,
+                'lastname' => $request->lastname,
+            ]);
+        }
 
         // Trigger the Registered event (Laravel will automatically send verification email if MustVerifyEmail is implemented)
         event(new Registered($user));
